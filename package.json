@@ -1,0 +1,39 @@
+{
+  "name": "hanewinpgp",
+  "version": "0.1.0",
+  "main": "dist/hanewinpgp.js",
+  "description": "PGP / GnuPG / OpenPGP Message Encryption in JavaScript by Herbert Hanewinkel.",
+  "homepage": "https://www.hanewin.net/encrypt/",
+  "author": {
+    "name": "Herbert Hanewinkel",
+    "web": "https://www.hanewin.net/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:dossy/hanewinpgp.git"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "clean": "gulp clean",
+    "lint": "gulp lint",
+    "test": "gulp test"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "dat.gui": "^0.6.1",
+    "del": "^3.0.0",
+    "gulp": "^3.9.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-esformatter": "^5.0.0",
+    "gulp-header": "^1.7.1",
+    "gulp-jsdoc": "^0.1.5",
+    "gulp-jshint": "^2.0.0",
+    "gulp-nodeunit": "0.0.5",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.5.1",
+    "jshint": "^2.8.0",
+    "jshint-stylish": "^2.1.0",
+    "nodeunit": "^0.9.1",
+    "png-js": "^0.1.1"
+  }
+}
