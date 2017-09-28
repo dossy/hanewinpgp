@@ -1,0 +1,1 @@
+const alert = console.log;
