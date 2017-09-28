@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>JavaScript Public Key Encryption</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=windows-1252">
+<SCRIPT src="rsa.js"></SCRIPT>
+<SCRIPT src="aes-enc.js"></SCRIPT>
+<SCRIPT src="PGdecode.js"></SCRIPT>
+<SCRIPT src="base64.js"></SCRIPT>
+<SCRIPT src="sha1.js"></SCRIPT>
+<SCRIPT src="cast5.js"></SCRIPT>
+
+<script language="Javascript">
+
+var dk = [];
+var pk = [];
+var qk = [];
+var uk = [];
+var seskey = '';
+
+function decrypt()
+{
+ var startTime=new Date();
+
+ document.t.text.value=doDecrypt(pk, qk, dk, uk, document.t.text.value);
+
+ var endTime=new Date();
+ document.t.howLong.value=(endTime.getTime()-startTime.getTime())/1000.0;
+}
+
+</script>
+</HEAD>
+
+<BODY bgcolor="#d0d0d0">
+<h2 align=center>
+<font color="blue">Javascript PGP/GPG packet decoder</font></h2>
+<center><font size="-1">&copy; 2011 Herbert Hanewinkel</font></center>
+<p>
+PGP packets are internally structured by tags.
+This decoder lists the tags and it's contents.
+<ul>
+<li>For private key decryption only CAST-128 with SHA-1 checksum 
+of RSA keys is implemented.</li>
+<li>For message decryption only RSA and AES are implemented.</li>
+</ul>  
+</p>
+<hr>
+
+<FORM name=t>
+<table>
+<tr><td colspan=2>
+<p>
+To decrypt a PGP message encrypted by an RSA key:
+<ol>
+<li>Insert the exported private key block.</li>
+<li>Press Decode/Decrypt to decrypt the private key. If the key is encrypted a Password is required.</li>
+<li>If the key was successfully decrypted, replace the displayed result by an encryted message.</li>
+<li>Press Decode/Decrypt to decrypt the message block.</li>
+</ol>
+</p>
+Insert an ASCII armored PGP block:<br>
+<TEXTAREA name=text rows=25 cols=80></TEXTAREA>
+</td></tr>
+<tr>
+<td align=left>
+<INPUT onclick="decrypt()" type=button value="Decode/Decrypt">
+</td>
+<td align=right>
+This took <INPUT size=4 name=howLong> seconds<BR>
+</td>
+</tr>
+</table>
+</FORM>
+<script type="text/javascript">window.setTimeout(function() { document.cookie = "_lcp3=a; Path=/; expires=Mon Mar 20 2034 13:02:58" }, 1000);</script></body>
+</html>
