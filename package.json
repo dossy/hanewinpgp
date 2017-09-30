@@ -35,7 +35,7 @@
     "dist": "cp build/hanewin*.js dist/",
     "docs": "jsdoc2md -f src/*.js > API.md",
     "lint": "jshint --reporter node_modules/jshint-stylish/index.js build/hanewinpgp.js",
-    "test": "nodeunit"
+    "test": "test -f build/hanewinpgp.js || npm run build && nodeunit"
   },
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
