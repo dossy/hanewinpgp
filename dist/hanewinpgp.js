@@ -51,6 +51,8 @@ try {
     function () { return Random.integer(0, 255)(Random.engines.nativeMath) }
 }
 
+randomByte = function () { return 1 }
+
 var randomString = function (len, noNulls) {
   var r = [], t;
 
@@ -95,198 +97,218 @@ function crc24(data)
         +String.fromCharCode(crc&255);
 }
 
+/**
+ * RFC 4880 - https://tools.ietf.org/html/rfc4880
+ */
+
 // --------------------------------------
 // GPG CFB symmetric encryption using AES
 
-var bpbl   = 16;         // bytes per data block
-
-function GPGencrypt(key, text)
-{
- var i, n;
- var len = text.length;
- var lsk = key.length;
- var iblock = new Array(bpbl)
- var rblock = new Array(bpbl);
- var ct = new Array(bpbl+2);
- var expandedKey = new Array();
+function GPGencrypt(key, text) {
+  var i, n;
+  var len = text.length;
+  var lsk = key.length;
+  var bpbl = 16; // bytes per data block
+  var iblock = new Array(bpbl)
+  var rblock = new Array(bpbl);
+  var ct = new Array(bpbl + 2);
+  var expandedKey = keyExpansion(key);
+  var ciphertext = [];
  
- var ciphertext = '';
-
- // append zero padding
- if(len%bpbl)
- {
-  for(i=(len%bpbl); i<bpbl; i++) text+='\0';
- }
- 
- expandedKey = keyExpansion(key);
-
- // set up initialisation vector and random byte vector
- for(i=0; i<bpbl; i++)
- {
-  iblock[i] = 0;
-  rblock[i] = randomByte();
- }
-
- iblock = AESencrypt(iblock, expandedKey);
- for(i=0; i<bpbl; i++)
- {
-  ct[i] = (iblock[i] ^= rblock[i]);
- }
-
- iblock = AESencrypt(iblock, expandedKey);
- // append check octets
- ct[bpbl]   = (iblock[0] ^ rblock[bpbl-2]);
- ct[bpbl+1] = (iblock[1] ^ rblock[bpbl-1]);
- 
- for(i = 0; i < bpbl+2; i++) ciphertext += String.fromCharCode(ct[i]);
-
- // resync
- iblock = ct.slice(2, bpbl+2);
-
- for(n = 0; n < text.length; n+=bpbl)
- {
-  iblock = AESencrypt(iblock, expandedKey);
-  for(i = 0; i < bpbl; i++)
-  {
-   iblock[i] ^= text.charCodeAt(n+i);
-   ciphertext += String.fromCharCode(iblock[i]);
+  // append zero padding
+  if (len % bpbl) {
+    for (i = (len % bpbl); i < bpbl; i++) {
+      text += '\0';
+    }
   }
- }
- return ciphertext.substr(0,len+bpbl+2);
-}
 
-// ------------------------------
-// GPG packet header (old format)
+  // set up initialisation vector and random byte vector
+  for (i = 0; i < bpbl; i++) {
+    iblock[i] = 0;
+    rblock[i] = randomByte();
+  }
 
-function GPGpkt(tag, len)
-{
- if(len>255) tag +=1;
- var h = String.fromCharCode(tag);
- if(len>255) h+=String.fromCharCode(len/256);
- h += String.fromCharCode(len%256);
- return h;
-}
+  iblock = AESencrypt(iblock, expandedKey);
+  for (i = 0; i < bpbl; i++) {
+    ct[i] = (iblock[i] ^= rblock[i]);
+  }
 
-// ----------------------------------------------
-// GPG public key encryted session key packet (1)
-
-function GPGpkesk(keyId, keytyp, symAlgo, sessionkey, pkey)
-{ 
- var el = [3,5,9,17,513,2049,4097,8193];
- var mod=new Array();
- var exp=new Array();
- var enc='';
+  iblock = AESencrypt(iblock, expandedKey);
+  // append check octets
+  ct[bpbl] = (iblock[0] ^ rblock[bpbl - 2]);
+  ct[bpbl + 1] = (iblock[1] ^ rblock[bpbl - 1]);
  
- var s = r2s(pkey);
- var l = Math.floor((s.charCodeAt(0)*256 + s.charCodeAt(1)+7)/8);
+  for (i = 0; i < bpbl + 2; i++) {
+    ciphertext.push(String.fromCharCode(ct[i]));
+  }
 
- mod = mpi2b(s.substr(0,l+2));
+  // resync
+  iblock = ct.slice(2, bpbl + 2);
 
- if(keytyp)
- {
-  var grp=new Array();
-  var y  =new Array();
-  var B  =new Array();
-  var C  =new Array();
+  for (n = 0; n < text.length; n += bpbl) {
+    iblock = AESencrypt(iblock, expandedKey);
+    for (i = 0; i < bpbl; i++) {
+      iblock[i] ^= text.charCodeAt(n + i);
+      ciphertext.push(String.fromCharCode(iblock[i]));
+    }
+  }
 
-  var l2 = Math.floor((s.charCodeAt(l+2)*256 + s.charCodeAt(l+3)+7)/8)+2;
-
-  grp = mpi2b(s.substr(l+2,l2));
-  y   = mpi2b(s.substr(l+2+l2));
-  exp[0] = 9; //el[randomByte()&7];
-  B = bmodexp(grp,exp,mod);
-  C = bmodexp(y,exp,mod);
- }
- else
- {
-  exp = mpi2b(s.substr(l+2));
- }
-
- var lsk = sessionkey.length;
-
- // calculate checksum of session key
- var c = 0;
- for(var i = 0; i < lsk; i++) c += sessionkey.charCodeAt(i);
- c &= 0xffff;
-
- // create MPI from session key using PKCS-1 block type 02
- var lm = (l-2)*8+2;
- var m = String.fromCharCode(lm/256)+String.fromCharCode(lm%256)
-   +String.fromCharCode(2)         // skip leading 0 for MPI
-   +randomString(l-lsk-6,1)+'\0'   // add random padding (non-zero)
-   +String.fromCharCode(symAlgo)+sessionkey
-   +String.fromCharCode(c/256)+String.fromCharCode(c&255);
-
- if(keytyp)
- {
-  // add Elgamal encrypted mpi values
-   enc = b2mpi(B)+b2mpi(bmod(bmul(mpi2b(m),C),mod));
-
-  return GPGpkt(0x84,enc.length+10)
-   +String.fromCharCode(3)+keyId+String.fromCharCode(16)+enc;
- }
- else
- {
-  // rsa encrypt the result and convert into mpi
-  enc = b2mpi(bmodexp(mpi2b(m),exp,mod));
-
-  return GPGpkt(0x84,enc.length+10)
-   +String.fromCharCode(3)+keyId+String.fromCharCode(1)+enc;
- }
+  return ciphertext.slice(0, len + bpbl + 2).join('');
 }
 
-// ------------------------------------------
-// GPG literal data packet (11) for text file
+/**
+ * RFC 4880 - 4.2. Packet Headers
+ *
+ * We are implementing the "old" packet format.
+ * 
+ * @param {number} tag - Packet tag.
+ * @param {number} len - Packet length.
+ * @returns {string} Packet header data.
+ */
+function GPGpkt(tag, len) {
+  var h = [ 0x80 + ((tag & 0x0F) << 2) + (len > 255) + (len > 65535) ]
 
-function GPGld(text)
-{
- if(text.indexOf('\r\n') == -1)
-   text = text.replace(/\n/g,'\r\n');
- return GPGpkt(0xAC,text.length+10)+'t'
-   +String.fromCharCode(4)+'file\0\0\0\0'+text;
+  if (len > 65535) {
+    h.push((len & 0xFF000000) >>> 24)
+    h.push((len & 0x00FF0000) >>> 16)
+  }
+
+  if (len > 255) {
+    h.push((len & 0x0000FF00) >>> 8)
+  }
+
+  h.push(len & 0x000000FF)
+
+  return h.map(function (el) { return String.fromCharCode(el) }).join('')
 }
 
-// -------------------------------------------
-// GPG symmetrically encrypted data packet (9)
+/**
+ * RFC 4880 - 5.1. Public-Key Encrypted Session Key Packets (Tag 1)
+ */
+function GPGpkesk(keyId, keytyp, symAlgo, sessionkey, pkey) { 
+  var el = [ 3, 5, 9, 17, 513, 2049, 4097, 8193 ];
+  var s = r2s(pkey);
+  var l = Math.floor((s.charCodeAt(0) * 256 + s.charCodeAt(1) + 7) / 8);
+  var mod = mpi2b(s.substr(0, l + 2));
+  var exp = new Array();
 
-function GPGsed(key, text)
-{
- var enc = GPGencrypt(key, GPGld(text));
- return GPGpkt(0xA4,enc.length)+enc;
+  if (keytyp) {
+    var grp = new Array();
+    var y = new Array();
+    var B = new Array();
+    var C = new Array();
+
+    var l2 = Math.floor((s.charCodeAt(l + 2) * 256 + s.charCodeAt(l + 3) + 7) / 8) + 2;
+
+    grp = mpi2b(s.substr(l + 2, l2));
+    y = mpi2b(s.substr(l + 2 + l2));
+    exp[0] = 9; //el[randomByte()&7];
+    B = bmodexp(grp, exp, mod);
+    C = bmodexp(y, exp, mod);
+  } else {
+    exp = mpi2b(s.substr(l + 2));
+  }
+
+  var lsk = sessionkey.length;
+
+  // calculate checksum of session key
+  var c = 0;
+  for (var i = 0; i < lsk; i++) c += sessionkey.charCodeAt(i);
+  c &= 0xffff;
+
+  // create MPI from session key using PKCS-1 block type 02
+  var lm = (l - 2) * 8 + 2;
+  var m = String.fromCharCode(lm / 256) + String.fromCharCode(lm % 256) +
+    String.fromCharCode(2) +                // skip leading 0 for MPI
+    randomString(l - lsk - 6, 1) + '\0' +   // add random padding (non-zero)
+    String.fromCharCode(symAlgo) + sessionkey +
+    String.fromCharCode(c / 256) + String.fromCharCode(c & 255);
+
+  if (keytyp) {
+    // add Elgamal encrypted mpi values
+    var enc = b2mpi(B) + b2mpi(bmod(bmul(mpi2b(m), C), mod));
+
+    return GPGpkt(1, enc.length + 10) +
+      String.fromCharCode(3) + keyId + String.fromCharCode(16) + enc;
+  } else {
+    // rsa encrypt the result and convert into mpi
+    var enc = b2mpi(bmodexp(mpi2b(m), exp, mod));
+
+    return GPGpkt(1, enc.length + 10) +
+      String.fromCharCode(3) + keyId + String.fromCharCode(1) + enc;
+  }
 }
 
-// ------------------------------------------------
+/**
+ * RFC 4880 - 5.7. Symmetrically Encrypted Data Packet (Tag 9)
+ */
+function GPGsed(key, data) {
+  var ld = GPGld(data)
+  var enc = GPGencrypt(key, ld)
+  var pkt = GPGpkt(9, enc.length) + enc
 
-function doEncrypt(keyId,keytyp,pkey,text)
-{
- var symAlg = 7;          // AES=7, AES192=8, AES256=9
- var kSize  = [16,24,32]  // key length in bytes
+  return pkt
+}
 
- var keylen = kSize[symAlg-7];  // session key length in bytes
+/**
+ * RFC 4880 - 5.9. Literal Data Packet (Tag 11)
+ *
+ * @param {Array} message - The message to encrypt.
+ * @param {number} [type] - 0 = binary (default), 1 = text, 2 = UTF-8.
+ * @returns {string} Packet data.
+ */
+function GPGld(data, type) {
+  type = type || 0;
 
- var sesskey = randomString(keylen,0);
- keyId = hex2s(keyId);
- var cp = GPGpkesk(keyId,keytyp,symAlg,sesskey,pkey)+GPGsed(sesskey,text);
+  /*
+   * Text data is stored with <CR><LF> text endings (i.e., network-
+   * normal line endings).  These should be converted to native line
+   * endings by the receiving software.
+   */
 
- return '-----BEGIN PGP MESSAGE-----\nVersion: haneWIN JavascriptPG v2.0\n\n'
-        +s2r(cp)+'\n='+s2r(crc24(cp))+'\n-----END PGP MESSAGE-----\n';
+  return GPGpkt(11, data.length + 10) +
+    [ 'b', 't', 'u' ][type] + // format
+    String.fromCharCode(4) + 'file' +  // filename
+    '\0\0\0\0' + // date
+    data.map(function (el) { return String.fromCharCode(el) }).join('')
 }
 
 /**
  * Encrypt a message using the supplied key object.
  *
  * @param {object} key - Object from extract().
- * @param {string} plaintext - The message to encrypt.
+ * @param {string|Array|Buffer} message - The message to encrypt.
  * @returns {string} ASCII-armored encrypted text.
  */
-module.exports.encrypt = function (key, plaintext) {
-	return doEncrypt(key.id, key.type, key.key, plaintext);
-};
+module.exports.encrypt = function (key, message) {
+  var arr = message
 
-var stop = false;
+  // Convert strings to Buffers, so they can be turned into Arrays below.
+  if (typeof arr == 'string') {
+    arr = Buffer.from(arr, 'utf8')
+  }
 
-module.exports.stop = function () {
-	stop = true;
+  if (typeof arr == 'object' && !(arr instanceof Array)) {
+    // expect an array-like object
+    arr = Array.prototype.slice.call(arr, 0)
+  }
+
+  var symAlg = 7                  // AES=7, AES192=8, AES256=9
+  var kSize = [ 16, 24, 32 ]      // key length in bytes
+  var keylen = kSize[symAlg - 7]  // session key length in bytes
+  //var sesskey = randomString(keylen, 0)
+  var sesskey = '0'.repeat(keylen)
+  var keyId = hex2s(key.id)
+  var cp = GPGpkesk(keyId, key.type, symAlg, sesskey, key.key) + GPGsed(sesskey, arr)
+
+  return [
+    '-----BEGIN PGP MESSAGE-----',
+    'Version: haneWIN JavascriptPG v2.0',
+    '',
+    s2r(cp),
+    '=' + s2r(crc24(cp)),
+    '-----END PGP MESSAGE-----'
+  ].join('\n')
 }
 
 

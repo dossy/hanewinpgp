@@ -32,7 +32,7 @@ const pubkey = [
     'KAsIopmZ7u6XYAzeE0X6fHFPHIJHqX5SuBmEg4h2',
     '=T7y7',
     '-----END PGP PUBLIC KEY BLOCK-----'
-  ].join("\n"),
+  ].join('\n'),
   privkey = [
     '-----BEGIN PGP PRIVATE KEY BLOCK-----',
     '',
@@ -91,7 +91,7 @@ const pubkey = [
     'yuvaUy3LKAsIopmZ7u6XYAzeE0X6fHFPHIJHqX5SuBmEg4h2',
     '=0+3U',
     '-----END PGP PRIVATE KEY BLOCK-----'
-  ].join("\n")
+  ].join('\n')
 
 exports['extract'] = function (test) {
   test.expect(7)
@@ -104,7 +104,7 @@ exports['extract'] = function (test) {
     hanewinpgp.extract([
       '-----BEGIN PGP PUBLIC KEY BLOCK-----',
       '-----END PGP PUBLIC KEY BLOCK-----'
-    ].join("\n"))
+    ].join('\n'))
   }, 'Invalid PGP Public Key Block', 'empty key block')
 
   test.throws(function () {
@@ -112,7 +112,7 @@ exports['extract'] = function (test) {
       '-----BEGIN PGP PUBLIC KEY BLOCK-----',
       'asdf',
       '-----END PGP PUBLIC KEY BLOCK-----'
-    ].join("\n"))
+    ].join('\n'))
   }, 'Invalid PGP Public Key Block', 'garbage key block')
 
   var key = hanewinpgp.extract(pubkey)
@@ -125,14 +125,11 @@ exports['extract'] = function (test) {
   test.done()
 }
 
-exports.encrypt = function (test) {
-  test.expect(process.browser ? 2 : 3)
-
+function test_encrypt(test, message) {
   var key = hanewinpgp.extract(pubkey)
-  var plaintext = 'your secret text goes here'
-  var encrypted = hanewinpgp.encrypt(key, plaintext)
+  var encrypted = hanewinpgp.encrypt(key, message)
 
-  //console.log(encrypted)
+  console.log(encrypted)
 
   test.ok(encrypted.match(/^-----BEGIN PGP MESSAGE-----$/m), 'has begin line')
   test.ok(encrypted.match(/^-----END PGP MESSAGE-----$/m), 'has end line')
@@ -161,8 +158,71 @@ exports.encrypt = function (test) {
     //child.stdout && console.log('stdout', child.stdout.toString())
     //child.stderr && console.log('stderr', child.stderr.toString())
 
-    test.equal(child.stdout, plaintext, 'decrypted successfully')
+    var expected = Buffer.from(message)
+
+    test.equal(child.stdout.length, expected.length, 'lengths match')
+    test.ok(child.stdout.equals(expected), 'decrypted successfully')
+  }
+}
+
+exports['encrypt ascii text'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+  test_encrypt(test, 'your secret text goes here')
+  test.done()
+}
+
+exports['encrypt ascii text with newlines'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+  test_encrypt(test, 'your secret\ntext goes\nhere')
+  test.done()
+}
+
+exports['encrypt utf-8 text'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+  test_encrypt(test, 'åêìøü')
+  test.done()
+}
+
+exports['encrypt byte 13 as array'] = function (test) {
+  test_encrypt(test, [ 13 ])
+  test.done()
+}
+
+exports['encrypt all bytes 0-255 as array'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+
+  var a = []
+  
+  for (var i = 0; i < 256; i++) {
+    a.push(i)
   }
 
+  test_encrypt(test, a)
+  test.done()
+}
+
+exports['encrypt all bytes 0-255 as buffer'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+
+  var a = []
+  
+  for (var i = 0; i < 256; i++) {
+    a.push(i)
+  }
+
+  test_encrypt(test, Buffer.from(a))
+  test.done()
+}
+
+exports['encrypt all bytes 0-255 as string'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+
+  var a = []
+  
+  for (var i = 0; i < 256; i++) {
+    a.push(i)
+  }
+
+  test_encrypt(test, a.map(function (el) { return String.fromCharCode(el) }).join(''))
   test.done()
 }
