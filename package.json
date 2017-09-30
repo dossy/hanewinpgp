@@ -3,11 +3,20 @@
   "version": "0.1.0",
   "main": "./dist/hanewinpgp.js",
   "description": "PGP / GnuPG / OpenPGP Message Encryption in JavaScript by Herbert Hanewinkel.",
-  "homepage": "https://www.hanewin.net/encrypt/",
+  "keywords": [
+    "pgp", "openpgp", "gpg", "gnupg"
+  ],
+  "homepage": "https://github.com/dossy/hanewinpgp#readme",
+  "bugs": "https://github.com/dossy/hanewinpgp/issues",
   "author": {
     "name": "Herbert Hanewinkel",
-    "web": "https://www.hanewin.net/"
+    "url": "https://www.hanewin.net/"
   },
+  "maintainers": [{
+    "name": "Dossy Shiobara",
+    "email": "dossy@panoptic.com",
+    "url": "http://panoptic.com/"
+  }],
   "repository": {
     "type": "git",
     "url": "git@github.com:dossy/hanewinpgp.git"
