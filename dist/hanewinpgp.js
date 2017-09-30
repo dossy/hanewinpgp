@@ -1,7 +1,7 @@
 /**
  * hanewinpgp - PGP / GnuPG / OpenPGP Message Encryption in JavaScript by Herbert Hanewinkel.
  * @version v0.1.0
- * @link https://www.hanewin.net/encrypt/
+ * @link https://github.com/dossy/hanewinpgp#readme
  * @license SEE LICENSE IN LICENSE
  */
 /* OpenPGP encryption using RSA/AES
@@ -288,6 +288,13 @@ function doEncrypt(keyId,keytyp,pkey,text)
         +s2r(cp)+'\n='+s2r(crc24(cp))+'\n-----END PGP MESSAGE-----\n';
 }
 
+/**
+ * Encrypt a message using the supplied key object.
+ *
+ * @param {object} key - Object from extract().
+ * @param {string} plaintext - The message to encrypt.
+ * @returns {string} ASCII-armored encrypted text.
+ */
 module.exports.encrypt = function (key, plaintext) {
 	return doEncrypt(key.id, key.type, key.key, plaintext);
 };

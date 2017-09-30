@@ -282,6 +282,13 @@ function doEncrypt(keyId,keytyp,pkey,text)
         +s2r(cp)+'\n='+s2r(crc24(cp))+'\n-----END PGP MESSAGE-----\n';
 }
 
+/**
+ * Encrypt a message using the supplied key object.
+ *
+ * @param {object} key - Object from extract().
+ * @param {string} plaintext - The message to encrypt.
+ * @returns {string} ASCII-armored encrypted text.
+ */
 module.exports.encrypt = function (key, plaintext) {
 	return doEncrypt(key.id, key.type, key.key, plaintext);
 };

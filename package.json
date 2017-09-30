@@ -4,7 +4,10 @@
   "main": "./dist/hanewinpgp.js",
   "description": "PGP / GnuPG / OpenPGP Message Encryption in JavaScript by Herbert Hanewinkel.",
   "keywords": [
-    "pgp", "openpgp", "gpg", "gnupg"
+    "pgp",
+    "openpgp",
+    "gpg",
+    "gnupg"
   ],
   "homepage": "https://github.com/dossy/hanewinpgp#readme",
   "bugs": "https://github.com/dossy/hanewinpgp/issues",
@@ -12,11 +15,13 @@
     "name": "Herbert Hanewinkel",
     "url": "https://www.hanewin.net/"
   },
-  "maintainers": [{
-    "name": "Dossy Shiobara",
-    "email": "dossy@panoptic.com",
-    "url": "http://panoptic.com/"
-  }],
+  "maintainers": [
+    {
+      "name": "Dossy Shiobara",
+      "email": "dossy@panoptic.com",
+      "url": "http://panoptic.com/"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:dossy/hanewinpgp.git"
@@ -26,27 +31,25 @@
     "build:nodeunit": "test -f node_modules/nodeunit/dist/browser/nodeunit.js || (cd node_modules/nodeunit && make -i browser)",
     "build:browserify": "browserify -r ./test/encrypt.js -o build/tests.js -x tmp -x fs -x child_process",
     "build:test": "npm run build:nodeunit && npm run build:browserify",
-    "clean": "gulp clean",
-    "dist": "gulp dist",
-    "docs": "gulp docs",
-    "lint": "gulp lint",
-    "test": "gulp test"
+    "clean": "rimraf build",
+    "dist": "cp build/hanewin*.js dist/",
+    "docs": "jsdoc2md -f src/*.js > API.md",
+    "lint": "jshint --reporter node_modules/jshint-stylish/index.js build/hanewinpgp.js",
+    "test": "nodeunit"
   },
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "browserify": "^14.4.0",
-    "del": "^3.0.0",
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",
     "gulp-header": "^1.7.1",
-    "gulp-jsdoc": "^0.1.5",
-    "gulp-jshint": "^2.0.0",
-    "gulp-nodeunit": "0.0.5",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.5.1",
-    "jshint": "^2.8.0",
-    "jshint-stylish": "^2.1.0",
-    "nodeunit": "^0.9.1",
+    "jsdoc-to-markdown": "^3.0.0",
+    "jshint": "^2.9.5",
+    "jshint-stylish": "^2.2.1",
+    "nodeunit": "^0.9.5",
+    "rimraf": "^2.6.2",
     "tmp": "0.0.33"
   },
   "dependencies": {}

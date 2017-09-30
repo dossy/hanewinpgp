@@ -1,0 +1,8 @@
+{
+    "asi": true,
+    "browser": true,
+    "browserify": true,
+    "esversion": 3,
+    "maxerr": 100,
+    "node": true
+}
