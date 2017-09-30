@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
-var gulp = require('gulp');
-var pkg = require('./package.json');
+const gulp = require('gulp')
+const pkg = require('./package.json')
 
-var banner = [
+const banner = [
   '/**',
   ' * <%= pkg.name %> - <%= pkg.description %>',
   ' * @version v<%= pkg.version %>',
@@ -21,7 +21,7 @@ gulp.task('clean', function (cb) {
 });
 
 gulp.task('build', function() {
-  var files = [
+  const files = [
     'src/**/*.js'
   ];
 
@@ -36,8 +36,8 @@ gulp.task('build', function() {
 });
 
 gulp.task('dist', [ 'build' ], function() {
-  var files = [
-    'build/**'
+  const files = [
+    'build/hanewinpgp*.js'
   ];
 
   return gulp.src(files)
@@ -50,15 +50,15 @@ gulp.task('docs', function() {
 });
 
 gulp.task('lint', function() {
-  var jshint = require('gulp-jshint');
-  var stylish = require('jshint-stylish');
+  const jshint = require('gulp-jshint');
+  const stylish = require('jshint-stylish');
 
   return gulp.src('src/**/*.js')
     .pipe(jshint())
     .pipe(jshint.reporter(stylish));
 });
 
-gulp.task('test', function (cb) {
+gulp.task('test', [ 'build' ], function (cb) {
   gulp.src('test/**/*.js')
     .pipe(require('gulp-nodeunit')())
     .on('end', cb);

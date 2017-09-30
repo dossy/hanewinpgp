@@ -188,8 +188,9 @@ function bdiv(a,b)
  // trivial cases; a < b
  if(n < t || n==t && (a[n]<b[n] || n>0 && a[n]==b[n] && a[n-1]<b[n-1]))
  {
-  this.q=[0]; this.mod=a;
-  return this;
+  //this.q=[0]; this.mod=a;
+  //return this;
+  return { q: [ 0 ], mod: a }
  }
 
  // trivial cases; q < 4
@@ -204,8 +205,9 @@ function bdiv(a,b)
    if(xx.length==0) break;
    x=xx; qq++;
   }
-  this.q=[qq]; this.mod=x;
-  return this;
+  //this.q=[qq]; this.mod=x;
+  //return this;
+  return { q: [ qq ], mod: x }
  }
 
  // normalize
@@ -266,9 +268,10 @@ function bdiv(a,b)
   x[x.length-1]>>=shift;
  }
 
- this.q = zclip(q);
- this.mod = zclip(x);
- return this;
+ //this.q = zclip(q);
+ //this.mod = zclip(x);
+ //return this;
+ return { q: zclip(q), mod: zclip(x) }
 }
 
 function simplemod(i,m) // returns the mod where m < 2^bd

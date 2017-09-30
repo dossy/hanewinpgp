@@ -1,7 +1,7 @@
 {
   "name": "hanewinpgp",
   "version": "0.1.0",
-  "main": "dist/hanewinpgp.js",
+  "main": "./dist/hanewinpgp.js",
   "description": "PGP / GnuPG / OpenPGP Message Encryption in JavaScript by Herbert Hanewinkel.",
   "homepage": "https://www.hanewin.net/encrypt/",
   "author": {
@@ -14,14 +14,18 @@
   },
   "scripts": {
     "build": "gulp build",
+    "build:nodeunit": "test -f node_modules/nodeunit/dist/browser/nodeunit.js || (cd node_modules/nodeunit && make -i browser)",
+    "build:browserify": "browserify -r ./test/encrypt.js -o build/tests.js -x tmp -x fs -x child_process",
+    "build:test": "npm run build:nodeunit && npm run build:browserify",
     "clean": "gulp clean",
     "dist": "gulp dist",
     "docs": "gulp docs",
     "lint": "gulp lint",
     "test": "gulp test"
   },
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
+    "browserify": "^14.4.0",
     "del": "^3.0.0",
     "gulp": "^3.9.0",
     "gulp-concat": "^2.6.0",

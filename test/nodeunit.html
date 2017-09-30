@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+  <head>
+    <title>nodeunit tests</title>
+    <link rel="stylesheet" type="text/css" href="../node_modules/nodeunit/dist/browser/nodeunit.css" />
+    <script src="../node_modules/nodeunit/dist/browser/nodeunit.js"></script>
+    <script src="../build/tests.js"></script>
+  </head>
+  <body>
+    <h1 id="nodeunit-header">nodeunit tests</h1>
+    <script>
+      nodeunit.run({ 'tests': require('/test/encrypt.js') }, {});
+    </script>
+  </body>
+</html>
