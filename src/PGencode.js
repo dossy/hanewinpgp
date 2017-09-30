@@ -31,48 +31,32 @@
  *   if the same buttons are clicked on the screen.
  */
 
-var rnArray = new Array(256);
-var rnNext = 0;
-var rnRead = 0;
+var randomByte
 
-function randomByte() { return Math.round(Math.random()*255)&255; }
-function timeByte() { return ((new Date().getTime())>>>2)&255; }
+try {
+  const crypto = require('crypto')
 
-function rnTimer()
-{
- var t = timeByte(); // load time
+  randomByte = function () { return crypto.randomBytes(1)[0] }
+} catch (e) {
+  const Random = require('random-js')
 
- for(var i=0; i<256; i++)
- {
-  t ^= randomByte();
-  rnArray[(rnNext++)&255] ^= t;
- } 
- if (!stop) {
-    setTimeout(rnTimer, randomByte()|128);
- }
+  randomByte = Random.engines.browserCrypto ?
+    function () { return Random.integer(0, 255)(Random.engines.browserCrypto) } :
+    function () { return Random.integer(0, 255)(Random.engines.nativeMath) }
 }
 
-// rnTimer() and mouseMoveCollect() are started on page load.
+var randomString = function (len, noNulls) {
+  var r = [], t;
 
-rnTimer();
-//eventsCollect();
+  for (var i = 0; i < len;) {
+    t = randomByte()
+    if (t == 0 && noNulls) continue
+    i++
 
-// ----------------------------------------
+    r.push(String.fromCharCode(t))
+  }
 
-function randomString(len, nozero)
-{
- var r = '';
- var t = timeByte(); // exec time
-
- for(var i=0; i<len;)
- {
-   t ^= rnArray[(rnRead++)&255]^mouseByte()^keyByte();
-   if(t==0 && nozero) continue;
-   i++;
-
-   r+=String.fromCharCode(t);
- }
- return r;
+  return r.join('')
 }
 
 // ----------------------------------------
@@ -292,9 +276,3 @@ function doEncrypt(keyId,keytyp,pkey,text)
 module.exports.encrypt = function (key, plaintext) {
 	return doEncrypt(key.id, key.type, key.key, plaintext);
 };
-
-var stop = false;
-
-module.exports.stop = function () {
-	stop = true;
-}

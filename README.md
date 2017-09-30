@@ -37,8 +37,6 @@ var plaintext = "your plaintext message here";
 var key = hanewinpgp.extract(pubkey);
 var encrypted = hanewinpgp.encrypt(key, plaintext);
 
-hanewinpgp.stop();
-
 // encrypted now contains ASCII armored encrypted message
 ```
 

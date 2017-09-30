@@ -28,9 +28,10 @@
   },
   "scripts": {
     "build": "gulp build",
+    "build:browserify": "browserify -r ./build/hanewinpgp.js -o build/hanewinpgp.browser.js -x crypto && uglifyjs build/hanewinpgp.browser.js > build/hanewinpgp.browser-min.js",
+    "build:browserify:test": "browserify -r ./test/encrypt.js -o build/tests.js -x build/hanewinpgp.js -x tmp -x fs -x child_process -x crypto",
     "build:nodeunit": "test -f node_modules/nodeunit/dist/browser/nodeunit.js || (cd node_modules/nodeunit && make -i browser)",
-    "build:browserify": "browserify -r ./test/encrypt.js -o build/tests.js -x tmp -x fs -x child_process",
-    "build:test": "npm run build:nodeunit && npm run build:browserify",
+    "build:test": "npm run build:nodeunit && npm run build:browserify:test",
     "clean": "rimraf build",
     "dist": "cp build/hanewin*.js dist/",
     "docs": "jsdoc2md -f src/*.js > API.md",
@@ -46,11 +47,14 @@
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.5.1",
     "jsdoc-to-markdown": "^3.0.0",
-    "jshint": "^2.9.5",
     "jshint-stylish": "^2.2.1",
     "nodeunit": "^0.9.5",
+    "random-js": "^1.0.8",
     "rimraf": "^2.6.2",
-    "tmp": "0.0.33"
+    "tmp": "0.0.33",
+    "uglify": "^0.1.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "jshint": "^2.9.5"
+  }
 }

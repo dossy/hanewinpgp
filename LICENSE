@@ -23,22 +23,6 @@ cast5.js:
 
 ----
 
-mouse.js:
-
-/* Collect entropy from mouse motion and key press events
- * Note that this is coded to work with either DOM2 or Internet Explorer
- * style events.
- * We don't use every successive mouse movement event.
- * Instead, we use some bits from random() to determine how many
- * subsequent mouse movements we ignore before capturing the next one.
- * rc4 is used as a mixing function for the captured mouse events.
- *
- * mouse motion event code originally from John Walker
- * key press timing code thanks to Nigel Johnstone
- */
-
-----
-
 rsa.js:
 
 /* RSA public key encryption/decryption

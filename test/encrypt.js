@@ -166,12 +166,3 @@ exports.encrypt = function (test) {
 
   test.done()
 }
-
-exports.cleanup = function (test) {
-  test.expect(1)
-
-  hanewinpgp.stop()
-
-  test.ok(true, 'stop called')
-  test.done()
-}
