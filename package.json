@@ -35,7 +35,7 @@
     "build:min": "npm run build:main:min && npm run build:browser:min",
     "build:nodeunit": "test -f node_modules/nodeunit/dist/browser/nodeunit.js || (cd node_modules/nodeunit && make -i browser)",
     "build:test": "npm run build:nodeunit && npm run build:test:browser",
-    "build:test:browser": "npm run build:main && npm run build:browser && browserify -r ./test/encrypt.js -o build/tests.js -x build/hanewinpgp.js -x tmp -x fs -x child_process -x crypto",
+    "build:test:browser": "npm run build:main && npm run build:browser && browserify -r ./test/encrypt.js -o build/tests.js -x tmp -x fs -x child_process -x crypto",
     "clean": "rimraf build",
     "dist": "npm run build && npm run build:browser && npm run build:min && cp build/hanewin*.js dist/",
     "docs": "jsdoc2md -f src/*.js > API.md",
