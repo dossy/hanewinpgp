@@ -296,7 +296,7 @@ module.exports.encrypt = function (key, message) {
 
   return [
     '-----BEGIN PGP MESSAGE-----',
-    'Version: haneWIN JavascriptPG v2.0',
+    'Version: hanewinpgp v' + VERSION,
     '',
     s2r(cp),
     '=' + s2r(crc24(cp)),

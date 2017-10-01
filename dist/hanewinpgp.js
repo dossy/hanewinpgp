@@ -1,9 +1,11 @@
-/**
+/*!
  * hanewinpgp - PGP / GnuPG / OpenPGP Message Encryption in JavaScript by Herbert Hanewinkel.
  * @version v0.1.0
  * @link https://github.com/dossy/hanewinpgp#readme
- * @license SEE LICENSE IN LICENSE
  */
+
+var VERSION = '0.1.0';
+
 /* OpenPGP encryption using RSA/AES
  * Copyright 2005-2006 Herbert Hanewinkel, www.haneWIN.de
  * version 2.0, check www.haneWIN.de for the latest version
@@ -51,7 +53,7 @@ try {
     function () { return Random.integer(0, 255)(Random.engines.nativeMath) }
 }
 
-randomByte = function () { return 1 }
+//randomByte = function () { return 1 }
 
 var randomString = function (len, noNulls) {
   var r = [], t;
@@ -296,21 +298,19 @@ module.exports.encrypt = function (key, message) {
   var symAlg = 7                  // AES=7, AES192=8, AES256=9
   var kSize = [ 16, 24, 32 ]      // key length in bytes
   var keylen = kSize[symAlg - 7]  // session key length in bytes
-  //var sesskey = randomString(keylen, 0)
-  var sesskey = '0'.repeat(keylen)
+  var sesskey = randomString(keylen, 0)
   var keyId = hex2s(key.id)
   var cp = GPGpkesk(keyId, key.type, symAlg, sesskey, key.key) + GPGsed(sesskey, arr)
 
   return [
     '-----BEGIN PGP MESSAGE-----',
-    'Version: haneWIN JavascriptPG v2.0',
+    'Version: hanewinpgp v' + VERSION,
     '',
     s2r(cp),
     '=' + s2r(crc24(cp)),
     '-----END PGP MESSAGE-----'
   ].join('\n')
 }
-
 
 /* OpenPGP public key extraction
  * Copyright 2005 Herbert Hanewinkel, www.haneWIN.de
@@ -512,7 +512,6 @@ module.exports.extract = function (text) {
     key: key.pkey.replace(/\n/g, '')
   };
 };
-
 
 /* Rijndael (AES) Encryption
  * Copyright 2005 Herbert Hanewinkel, www.haneWIN.de
@@ -1000,7 +999,6 @@ function AESencrypt(block, ctx)
 }
 
 
-
 /* OpenPGP radix-64/base64 string encoding/decoding
  * Copyright 2005 Herbert Hanewinkel, www.haneWIN.de
  * version 1.0, check www.haneWIN.de for the latest version
@@ -1083,12 +1081,10 @@ function r2s(t)
  }
  return r;
 }
-
 //const alert = console.log;
 const alert = function(message) {
   throw new Error(message)
 }
-
 /* RSA public key encryption/decryption
  * The following functions are (c) 2000 by John M Hanna and are
  * released under the terms of the Gnu Public License.
@@ -1558,7 +1554,6 @@ function b2mpi(b)
  if(bits) for(n=rn; n>=0; n--) rr+=String.fromCharCode(r[n]);
  return rr;
 }
-
 
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
