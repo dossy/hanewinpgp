@@ -20,8 +20,6 @@ https://dossy.github.io/hanewinpgp/.
 
 ## Install
 
-TODO: Push this module up to NPM when it's ready to really use.
-
 ```
 $ npm install --save hanewinpgp
 ```
@@ -39,6 +37,13 @@ var encrypted = hanewinpgp.encrypt(key, plaintext);
 
 // encrypted now contains ASCII armored encrypted message
 ```
+
+## Demo
+
+You can try a [demo of this code][demo-url] right in your reasonably
+modern web browser.
+
+[demo-url]: https://dossy.github.io/hanewinpgp/demo-encrypt/
 
 ## License
 
