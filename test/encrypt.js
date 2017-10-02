@@ -96,24 +96,36 @@ const pubkey = [
 exports['extract'] = function (test) {
   test.expect(7)
 
-  test.throws(function () {
+  try {
     hanewinpgp.extract('')
-  }, 'No PGP Public Key Block', 'empty input')
 
-  test.throws(function () {
+    test.ok(false, 'empty input')
+  } catch (e) {
+    test.equal(e.message, 'No PGP Public Key Block', 'empty input')
+  }
+
+  try {
     hanewinpgp.extract([
       '-----BEGIN PGP PUBLIC KEY BLOCK-----',
       '-----END PGP PUBLIC KEY BLOCK-----'
     ].join('\n'))
-  }, 'Invalid PGP Public Key Block', 'empty key block')
 
-  test.throws(function () {
+    test.ok(false, 'empty key block')
+  } catch (e) {
+    test.equal(e.message, 'Invalid PGP Public Key Block', 'empty key block')
+  }
+
+  try {
     hanewinpgp.extract([
       '-----BEGIN PGP PUBLIC KEY BLOCK-----',
       'asdf',
       '-----END PGP PUBLIC KEY BLOCK-----'
     ].join('\n'))
-  }, 'Invalid PGP Public Key Block', 'garbage key block')
+
+    test.ok(false, 'garbage key block')
+  } catch (e) {
+    test.equal(e.message, 'Invalid PGP Public Key Block', 'garbage key block')
+  }
 
   var key = hanewinpgp.extract(pubkey)
 
@@ -129,7 +141,7 @@ function test_encrypt(test, message) {
   var key = hanewinpgp.extract(pubkey)
   var encrypted = hanewinpgp.encrypt(key, message)
 
-  console.log(encrypted)
+  //console.log(encrypted)
 
   test.ok(encrypted.match(/^-----BEGIN PGP MESSAGE-----$/m), 'has begin line')
   test.ok(encrypted.match(/^-----END PGP MESSAGE-----$/m), 'has end line')
