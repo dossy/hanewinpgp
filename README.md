@@ -3,6 +3,7 @@
 [![travis][travis-image]][travis-url]
 [![npm][npm-image]][npm-url]
 [![downloads][downloads-image]][downloads-url]
+[![browserstack][browserstack-image]][browserstack-url]
 
 [travis-image]: https://travis-ci.org/dossy/hanewinpgp.svg?branch=master
 [travis-url]: https://travis-ci.org/dossy/hanewinpgp
@@ -12,6 +13,9 @@
 
 [downloads-image]: https://img.shields.io/npm/dm/hanewinpgp.svg?style=flat
 [downloads-url]: https://npmjs.org/package/hanewinpgp
+
+[browserstack-image]: https://www.browserstack.com/automate/badge.svg?badge_key=V0pHUTRQNjdqMkFLVWpIVzdKWE9VSjBUc2VxaW5COE1ja3JCRTVNL0Q5OD0tLS94L0RYcWZNaE42QktFRkZXM0U3a2c9PQ==--dab2e0ddbe89c16963bdd438126279364766f633
+[browserstack-url]: https://www.browserstack.com/automate/public-build/V0pHUTRQNjdqMkFLVWpIVzdKWE9VSjBUc2VxaW5COE1ja3JCRTVNL0Q5OD0tLS94L0RYcWZNaE42QktFRkZXM0U3a2c9PQ==--dab2e0ddbe89c16963bdd438126279364766f633
 
 A very minimal implementation of PGP message encryption/decryption
 by Herbert Hanewinkel, originally posted to his site at
