@@ -27,20 +27,7 @@
     "url": "git@github.com:dossy/hanewinpgp.git"
   },
   "scripts": {
-    "build": "npm run build:main",
-    "build:browser": "(echo \"/*!\\n * ${npm_package_name}.browser - $npm_package_description\\n * @version v$npm_package_version\\n * @link $npm_package_homepage\\n */\\n\"; browserify -r ./build/hanewinpgp.js:hanewinpgp -x crypto) > build/hanewinpgp.browser.js",
-    "build:browser:min": "uglifyjs build/hanewinpgp.browser.js --preamble \"/*!\n * ${npm_package_name}.browser - $npm_package_description\n * @version v$npm_package_version\n * @link $npm_package_homepage\n */\" > build/hanewinpgp.browser-min.js",
-    "build:main": "test -d build || mkdir -p build && (echo \"/*!\\n * $npm_package_name - $npm_package_description\\n * @version v$npm_package_version\\n * @link $npm_package_homepage\\n */\\n\\nvar VERSION = '$npm_package_version';\\n\"; cat src/*.js) > build/hanewinpgp.js",
-    "build:main:min": "uglifyjs build/hanewinpgp.js --preamble \"/*!\n * ${npm_package_name} - $npm_package_description\n * @version v$npm_package_version\n * @link $npm_package_homepage\n */\" > build/hanewinpgp-min.js",
-    "build:min": "npm run build:main:min && npm run build:browser:min",
-    "build:nodeunit": "test -f node_modules/nodeunit/dist/browser/nodeunit.js || (cd node_modules/nodeunit && make -i browser)",
-    "build:test": "npm run build:nodeunit && npm run build:test:browser",
-    "build:test:browser": "npm run build:main && npm run build:browser && browserify -r ./test/encrypt.js -o build/tests.js -x tmp -x fs -x child_process -x crypto",
-    "clean": "rimraf build",
-    "dist": "npm run build && npm run build:browser && npm run build:min && cp build/hanewin*.js dist/",
-    "docs": "jsdoc2md -f src/*.js > API.md",
-    "lint": "jshint --reporter node_modules/jshint-stylish/index.js build/hanewinpgp.js",
-    "test": "npm run build && npm run build:nodeunit && nodeunit"
+    "test": "make test"
   },
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
@@ -50,7 +37,6 @@
     "jshint-stylish": "^2.2.1",
     "nodeunit": "^0.9.5",
     "random-js": "^1.0.8",
-    "rimraf": "^2.6.2",
     "tmp": "0.0.33",
     "uglify-js": "<3.0.0"
   },
