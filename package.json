@@ -32,6 +32,7 @@
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "browserify": "^14.4.0",
+    "browserstack-runner": "dossy/browserstack-runner#add_nodeunit",
     "jsdoc-to-markdown": "^3.0.0",
     "jshint": "^2.9.5",
     "jshint-stylish": "^2.2.1",

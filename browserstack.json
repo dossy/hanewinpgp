@@ -1,0 +1,9 @@
+{
+    "username": "BROWSERSTACK_USERNAME",
+    "key": "BROWSERSTACK_KEY",
+    "test_framework": "nodeunit",
+    "test_path": "test/nodeunit.html",
+    "browsers": [
+        "chrome_current"
+    ]
+}

@@ -68,7 +68,7 @@ build-nodeunit: node_modules/nodeunit/dist/browser/nodeunit.js | node_modules
 node_modules/nodeunit/dist/browser/nodeunit.js: node_modules
 	cd node_modules/nodeunit && make -i browser
 
-build/tests.js: node_modules build test/encrypt.js
+build/tests.js: test/encrypt.js build/hanewinpgp.js | node_modules
 	browserify -r ./test/encrypt.js -o build/tests.js -x tmp -x fs -x child_process -x crypto
 
 .PHONY: dist
@@ -82,13 +82,16 @@ API.md: node_modules src/*.js
 	jsdoc2md -f src/*.js > API.md
 
 .PHONY: lint
-lint: node_modules build/hanewinpgp.js
+lint: build/hanewinpgp.js | node_modules
 	jshint --reporter node_modules/jshint-stylish/index.js build/hanewinpgp.js
 
 .PHONY: test
-test: node_modules build/hanewinpgp.js
+test: build/hanewinpgp.js | node_modules
 	nodeunit
 
+.PHONY: test
+test-browser: build/hanewinpgp.browser.js build/tests.js | node_modules build-nodeunit
+
 .PHONY: browserstack
-browserstack: node_modules build-nodeunit build/hanewinpgp.browser.js build/tests.js
+browserstack: build/hanewinpgp.browser.js build/tests.js | node_modules build-nodeunit
 	browserstack-runner
