@@ -34,11 +34,11 @@
 var randomByte
 
 try {
-  const crypto = require('crypto')
+  var crypto = require('crypto')
 
   randomByte = function () { return crypto.randomBytes(1)[0] }
 } catch (e) {
-  const Random = require('random-js')
+  var Random = require('random-js')
 
   randomByte = Random.engines.browserCrypto ?
     function () { return Random.integer(0, 255)(Random.engines.browserCrypto) } :
@@ -275,6 +275,10 @@ function GPGld(data, type) {
  * @returns {string} ASCII-armored encrypted text.
  */
 module.exports.encrypt = function (key, message) {
+  if (typeof navigator != 'undefined' && /MSIE [0-9]+\.[0-9]+/.test(navigator.appVersion)) {
+    throw new Error('IE10 and older not supported.');
+  }
+
   var arr = message
 
   // Convert strings to Buffers, so they can be turned into Arrays below.

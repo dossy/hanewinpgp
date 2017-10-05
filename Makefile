@@ -1,7 +1,9 @@
 .PHONY: all
 all:
 
-PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/node_modules/.bin:$(PATH)
+# Must set SHELL for PATH for some reason.
+SHELL := /bin/bash
+PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))node_modules/.bin:$(PATH)
 
 .PHONY: clean
 clean:
@@ -40,8 +42,8 @@ export banner_browser
 build: build/hanewinpgp.js build/hanewinpgp-min.js | dirs
 
 build/hanewinpgp.js: src/*.js | dirs package.json
-	( echo "$$banner\n"; \
-	echo "var VERSION = '$(npm_package_version)';\n"; \
+	( echo -e "$$banner\n"; \
+	echo -e "var VERSION = '$(npm_package_version)';\n"; \
 	cat src/*.js ) >build/hanewinpgp.js
    
 build/hanewinpgp-min.js: build/hanewinpgp.js | dirs node_modules
@@ -51,7 +53,7 @@ build/hanewinpgp-min.js: build/hanewinpgp.js | dirs node_modules
 build-browser: build/hanewinpgp.browser.js build/hanewinpgp.browser-min.js | dirs
 
 build/hanewinpgp.browser.js: build/hanewinpgp.js | dirs package.json node_modules
-	( echo "$$banner_browser\n"; \
+	( echo -e "$$banner_browser\n"; \
 	browserify -r ./build/hanewinpgp.js:hanewinpgp -x crypto ) \
 	>build/hanewinpgp.browser.js
 

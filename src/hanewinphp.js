@@ -1,4 +1,4 @@
-//const alert = console.log;
-const alert = function(message) {
+//var alert = console.log;
+var alert = function(message) {
   throw new Error(message)
 }
