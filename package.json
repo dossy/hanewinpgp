@@ -1,6 +1,6 @@
 {
   "name": "hanewinpgp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "./dist/hanewinpgp.js",
   "description": "PGP / GnuPG / OpenPGP Message Encryption in JavaScript by Herbert Hanewinkel.",
   "keywords": [
