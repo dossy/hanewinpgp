@@ -137,129 +137,104 @@ exports['extract'] = function (test) {
   test.done()
 }
 
-if (process.browser && typeof navigator != 'undefined' && /MSIE [0-9]+\.[0-9]+/.test(navigator.appVersion)) {
-  exports['not supported on IE10 and older'] = function (test) {
-    test.expect(1)
+function test_encrypt(test, message) {
+  var key = hanewinpgp.extract(pubkey)
+  var encrypted = hanewinpgp.encrypt(key, message)
 
-    try {
-      var a = []
+  //console.log(encrypted)
 
-      for (var i = 0; i < 256; i++) {
-        a.push(i)
-      }
+  test.ok(encrypted.match(/^-----BEGIN PGP MESSAGE-----$/m), 'has begin line')
+  test.ok(encrypted.match(/^-----END PGP MESSAGE-----$/m), 'has end line')
 
-      var message = Buffer.from(a)
-      var key = hanewinpgp.extract(pubkey)
-      var encrypted = hanewinpgp.encrypt(key, message)
+  if (!process.browser) {
+    var tmp = require('tmp')
+    var fs = require('fs')
+    var spawnSync = require('child_process').spawnSync
 
-      test.ok(false, 'expected exception not thrown')
-    } catch (e) {
-      //console.log(e)
-      test.equal(e.message, 'IE10 and older not supported.', 'IE10 and older expects a thrown exception')
-    }
+    var tmpdir = tmp.dirSync({ unsafeCleanup: true }),
+      privfile = tmpdir.name + '/privkey.asc',
+      encfile = tmpdir.name + '/encrypted.asc'
 
-    test.done()
+    tmp.setGracefulCleanup()
+
+    var cmd, child
+
+    fs.writeFileSync(privfile, privkey)
+    fs.writeFileSync(encfile, encrypted)
+
+    cmd = [ 'gpg2', '--batch', '--no-tty', '--homedir', tmpdir.name, '--no-options', '--import', privfile ]
+    child = spawnSync(cmd[0], cmd.slice(1))
+
+    cmd = [ 'gpg2', '--batch', '--no-tty', '--homedir', tmpdir.name, '--no-options', '--decrypt', encfile ]
+    child = spawnSync(cmd[0], cmd.slice(1))
+    //child.stdout && console.log('stdout', child.stdout.toString())
+    //child.stderr && console.log('stderr', child.stderr.toString())
+
+    var expected = Buffer.from(message)
+
+    test.equal(child.stdout.length, expected.length, 'lengths match')
+    test.ok(child.stdout.equals(expected), 'decrypted successfully')
   }
-} else {
-  function test_encrypt(test, message) {
-    var key = hanewinpgp.extract(pubkey)
-    var encrypted = hanewinpgp.encrypt(key, message)
+}
 
-    //console.log(encrypted)
+exports['encrypt ascii text'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+  test_encrypt(test, 'your secret text goes here')
+  test.done()
+}
 
-    test.ok(encrypted.match(/^-----BEGIN PGP MESSAGE-----$/m), 'has begin line')
-    test.ok(encrypted.match(/^-----END PGP MESSAGE-----$/m), 'has end line')
+exports['encrypt ascii text with newlines'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+  test_encrypt(test, 'your secret\ntext goes\nhere')
+  test.done()
+}
 
-    if (!process.browser) {
-      var tmp = require('tmp')
-      var fs = require('fs')
-      var spawnSync = require('child_process').spawnSync
+exports['encrypt utf-8 text'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+  test_encrypt(test, 'åêìøü')
+  test.done()
+}
 
-      var tmpdir = tmp.dirSync({ unsafeCleanup: true }),
-        privfile = tmpdir.name + '/privkey.asc',
-        encfile = tmpdir.name + '/encrypted.asc'
+exports['encrypt byte 13 as array'] = function (test) {
+  test_encrypt(test, [ 13 ])
+  test.done()
+}
 
-      tmp.setGracefulCleanup()
+exports['encrypt all bytes 0-255 as array'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
 
-      var cmd, child
+  var a = []
 
-      fs.writeFileSync(privfile, privkey)
-      fs.writeFileSync(encfile, encrypted)
-
-      cmd = [ 'gpg2', '--batch', '--no-tty', '--homedir', tmpdir.name, '--no-options', '--import', privfile ]
-      child = spawnSync(cmd[0], cmd.slice(1))
-
-      cmd = [ 'gpg2', '--batch', '--no-tty', '--homedir', tmpdir.name, '--no-options', '--decrypt', encfile ]
-      child = spawnSync(cmd[0], cmd.slice(1))
-      //child.stdout && console.log('stdout', child.stdout.toString())
-      //child.stderr && console.log('stderr', child.stderr.toString())
-
-      var expected = Buffer.from(message)
-
-      test.equal(child.stdout.length, expected.length, 'lengths match')
-      test.ok(child.stdout.equals(expected), 'decrypted successfully')
-    }
-  }
-
-  exports['encrypt ascii text'] = function (test) {
-    test.expect(process.browser ? 2 : 4)
-    test_encrypt(test, 'your secret text goes here')
-    test.done()
-  }
-
-  exports['encrypt ascii text with newlines'] = function (test) {
-    test.expect(process.browser ? 2 : 4)
-    test_encrypt(test, 'your secret\ntext goes\nhere')
-    test.done()
+  for (var i = 0; i < 256; i++) {
+    a.push(i)
   }
 
-  exports['encrypt utf-8 text'] = function (test) {
-    test.expect(process.browser ? 2 : 4)
-    test_encrypt(test, 'åêìøü')
-    test.done()
+  test_encrypt(test, a)
+  test.done()
+}
+
+exports['encrypt all bytes 0-255 as buffer'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+
+  var a = []
+
+  for (var i = 0; i < 256; i++) {
+    a.push(i)
   }
 
-  exports['encrypt byte 13 as array'] = function (test) {
-    test_encrypt(test, [ 13 ])
-    test.done()
+  test_encrypt(test, Buffer.from(a))
+  test.done()
+}
+
+exports['encrypt all bytes 0-255 as string'] = function (test) {
+  test.expect(process.browser ? 2 : 4)
+
+  var a = []
+
+  for (var i = 0; i < 256; i++) {
+    a.push(i)
   }
 
-  exports['encrypt all bytes 0-255 as array'] = function (test) {
-    test.expect(process.browser ? 2 : 4)
-
-    var a = []
-
-    for (var i = 0; i < 256; i++) {
-      a.push(i)
-    }
-
-    test_encrypt(test, a)
-    test.done()
-  }
-
-  exports['encrypt all bytes 0-255 as buffer'] = function (test) {
-    test.expect(process.browser ? 2 : 4)
-
-    var a = []
-
-    for (var i = 0; i < 256; i++) {
-      a.push(i)
-    }
-
-    test_encrypt(test, Buffer.from(a))
-    test.done()
-  }
-
-  exports['encrypt all bytes 0-255 as string'] = function (test) {
-    test.expect(process.browser ? 2 : 4)
-
-    var a = []
-
-    for (var i = 0; i < 256; i++) {
-      a.push(i)
-    }
-
-    test_encrypt(test, a.map(function (el) { return String.fromCharCode(el) }).join(''))
-    test.done()
-  }
-} // if not IE10
+  test_encrypt(test, a.map(function (el) { return String.fromCharCode(el) }).join(''))
+  test.done()
+}

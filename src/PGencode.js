@@ -275,8 +275,8 @@ function GPGld(data, type) {
  * @returns {string} ASCII-armored encrypted text.
  */
 module.exports.encrypt = function (key, message) {
-  if (typeof navigator != 'undefined' && /MSIE [0-9]+\.[0-9]+/.test(navigator.appVersion)) {
-    throw new Error('IE10 and older not supported.');
+  if (typeof navigator != 'undefined' && /MSIE [0-8]\.[0-9]+/.test(navigator.appVersion)) {
+    throw new Error('IE8 and older not supported.');
   }
 
   var arr = message

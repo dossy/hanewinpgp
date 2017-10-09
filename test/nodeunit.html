@@ -4,16 +4,12 @@
     <title>nodeunit tests</title>
     <link rel="stylesheet" type="text/css" href="../node_modules/nodeunit/dist/browser/nodeunit.css" />
     <script type="text/javascript" src="../node_modules/nodeunit/dist/browser/nodeunit.js"></script>
-    <script type="text/javascript">
-      if (typeof Uint8Array == 'undefined') { window.Uint8Array = function () { return {} } }
-      if (typeof ArrayBuffer == 'undefined') { window.ArrayBuffer = function () { return {} } }
-    </script>
-    <script type="text/javascript" src="../build/tests.js"></script>
+    <script type="text/javascript" src="../build/tests.loader.js"></script>
   </head>
   <body>
     <h1 id="nodeunit-header">nodeunit tests</h1>
     <script>
-      nodeunit.run({ 'tests': require('/test/encrypt.js') }, {});
+      nodeunit.run({ 'tests': tests }, {});
     </script>
   </body>
 </html>

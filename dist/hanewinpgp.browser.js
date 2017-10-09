@@ -4,7 +4,7 @@
  * @link https://github.com/dossy/hanewinpgp#readme
  */
 
-require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.hanewinpgp = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -124,7 +124,7 @@ function fromByteArray (uint8) {
 /*!
  * The buffer module from node.js, for the browser.
  *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @author   Feross Aboukhadijeh <https://feross.org>
  * @license  MIT
  */
 /* eslint-disable no-proto */
@@ -2685,11 +2685,11 @@ var VERSION = '0.1.0';
 var randomByte
 
 try {
-  const crypto = require('crypto')
+  var crypto = require('crypto')
 
   randomByte = function () { return crypto.randomBytes(1)[0] }
 } catch (e) {
-  const Random = require('random-js')
+  var Random = require('random-js')
 
   randomByte = Random.engines.browserCrypto ?
     function () { return Random.integer(0, 255)(Random.engines.browserCrypto) } :
@@ -2926,6 +2926,10 @@ function GPGld(data, type) {
  * @returns {string} ASCII-armored encrypted text.
  */
 module.exports.encrypt = function (key, message) {
+  if (typeof navigator != 'undefined' && /MSIE [0-8]\.[0-9]+/.test(navigator.appVersion)) {
+    throw new Error('IE8 and older not supported.');
+  }
+
   var arr = message
 
   // Convert strings to Buffers, so they can be turned into Arrays below.
@@ -3724,8 +3728,8 @@ function r2s(t)
  }
  return r;
 }
-//const alert = console.log;
-const alert = function(message) {
+//var alert = console.log;
+var alert = function(message) {
   throw new Error(message)
 }
 /* RSA public key encryption/decryption
@@ -4402,4 +4406,5 @@ function binb2b64(binarray)
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":2,"crypto":"crypto","random-js":4}]},{},[]);
+},{"buffer":2,"crypto":"crypto","random-js":4}]},{},[])("hanewinpgp")
+});
