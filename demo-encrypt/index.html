@@ -20,12 +20,10 @@
     #key { min-height: 14em; }
     #output { min-height: 24em; }
   </style>
-  <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script type="text/javascript" src="hanewinpgp.browser.js"></script>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+  <script type="text/javascript" src="hanewinpgp.loader.js"></script>
   <script type="text/javascript">
     $(document).ready(function ($) {
-      var hanewinpgp = require('hanewinpgp')
-
       $('button.encrypt').on('click', function (e) {
         var key = hanewinpgp.extract($('#key').val())
         var encrypted = hanewinpgp.encrypt(key, $('#message').val())
